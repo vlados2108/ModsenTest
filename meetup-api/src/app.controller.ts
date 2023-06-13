@@ -2,15 +2,11 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes
 import { AppService } from './app.service';
 import { CreateDto } from './dto/create.dto';
 import { MeetupService } from './meetup/meetup.service';
+import { CreateUntransformedDto } from './dto/createUntransformed.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService,private readonly meetupService: MeetupService) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
 
   @Get()
   getAllMeetups(){
@@ -24,13 +20,27 @@ export class AppController {
 
   @UsePipes(new ValidationPipe())
   @Post('create')
-  createMeetup(@Body() dto: CreateDto){ 
-    return this.meetupService.createMeetup(dto)
+  createMeetup(@Body() dto: CreateUntransformedDto){ 
+    const data = { name:dto.name,
+
+      description:dto.description,
+
+      tegs:dto.tegs,
+      time: new Date(dto.time),
+      place: dto.place}
+    return this.meetupService.createMeetup(data)
   }
 
   @Put('change/:id')
-  changeMeetupInfo(@Param('id',ParseIntPipe) id:number, @Body() dto: CreateDto){
-    return this.meetupService.updateMeetup({id,data:dto})
+  changeMeetupInfo(@Param('id',ParseIntPipe) id:number, @Body() dto: CreateUntransformedDto){
+    const data = { name:dto.name,
+
+      description:dto.description,
+
+      tegs:dto.tegs,
+      time: new Date(dto.time),
+      place: dto.place}
+    return this.meetupService.updateMeetup({id,data:data})
   }
 
   @Delete('delete/:id')
