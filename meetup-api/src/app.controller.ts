@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreateDto } from './dto/create.dto';
 
@@ -21,17 +21,18 @@ export class AppController {
 
   }
 
+  @UsePipes(new ValidationPipe())
   @Post('create')
-  createMeetup(@Body() dto: CreateDto){
+  createMeetup(@Body() dto: CreateDto){ 
     return dto
   }
 
-  @Post('change/:id')
+  @Put('change/:id')
   changeMeetupInfo(@Param('id',ParseIntPipe) id:number, @Body() dto: CreateDto){
 
   }
 
-  @Post('delete/:id')
+  @Delete('delete/:id')
   deleteMeetup(@Param('id',ParseIntPipe) id:number){
 
   }
