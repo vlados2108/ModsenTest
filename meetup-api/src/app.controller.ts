@@ -1,12 +1,19 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,Request } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreateDto } from './dto/create.dto';
 import { MeetupService } from './meetup/meetup.service';
 import { CreateUntransformedDto } from './dto/createUntransformed.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService,private readonly meetupService: MeetupService) {}
+
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login (@Request() req){
+    return req.user
+  }
 
   @Get()
   getAllMeetups(){
