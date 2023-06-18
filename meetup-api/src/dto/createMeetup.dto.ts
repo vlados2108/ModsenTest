@@ -1,6 +1,6 @@
 import { IsDate, IsString } from "class-validator";
 
-export class CreateDto{
+export class CreateMeetupDto{
     @IsString()
     name:string;
 
@@ -15,4 +15,4 @@ export class CreateDto{
 
     @IsString()
     place: string;
-}
+} 
