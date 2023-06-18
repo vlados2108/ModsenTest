@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Meetup } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateDto } from 'src/dto/create.dto';
+import { CreateMeetupDto } from 'src/dto/createMeetup.dto';
 
 @Injectable()
 export class MeetupService {
@@ -26,7 +26,7 @@ export class MeetupService {
         }
     }
 
-    createMeetup = async (data:CreateDto): Promise<Meetup> => {
+    createMeetup = async (data:CreateMeetupDto): Promise<Meetup> => {
         try{
             return this.databaseService.meetup.create({data})
         }catch(e){
@@ -34,7 +34,7 @@ export class MeetupService {
         }
     }
 
-    updateMeetup = async (params:{id:number,data:CreateDto}):Promise<Meetup> => {
+    updateMeetup = async (params:{id:number,data:CreateMeetupDto}):Promise<Meetup> => {
         try{
             const {id,data} = params
             return this.databaseService.meetup.update({
