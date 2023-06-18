@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { UsersService } from './users/users.service';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [DatabaseModule, AuthModule, UsersModule,ConfigModule.forRoot({
@@ -15,6 +17,9 @@ import configuration from './config/configuration';
     load:[configuration],
   })],
   controllers: [AppController],
-  providers: [AppService, UsersService, MeetupService],
+  providers: [AppService, UsersService, MeetupService, {
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  },],
 })
 export class AppModule {}
