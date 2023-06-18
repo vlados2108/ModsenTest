@@ -9,6 +9,7 @@ import { AuthService } from './auth/auth.service';
 import { UsersService } from './users/users.service';
 import { UserDto } from './dto/user.dto';
 import { User } from '@prisma/client';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -20,6 +21,12 @@ export class AppController {
     return this.authService.login(req.user)
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+  
   @Post('registerUser')
   async registerUser(@Body() userDto:UserDto){
     return this.userService.createUser(userDto)
