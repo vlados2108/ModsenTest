@@ -1,6 +1,6 @@
 import { IsDate, IsString } from "class-validator";
 
-export class CreateUntransformedDto{
+export class CreateMeetupUntransformedDto{
     @IsString()
     name:string;
 
