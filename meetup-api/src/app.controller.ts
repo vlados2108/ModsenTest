@@ -1,18 +1,28 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,Request } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateDto } from './dto/create.dto';
+import { CreateMeetupDto } from './dto/createMeetup.dto';
 import { MeetupService } from './meetup/meetup.service';
-import { CreateUntransformedDto } from './dto/createUntransformed.dto';
+import { CreateMeetupUntransformedDto } from './dto/createMeetupUntransformed.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
+import { UsersService } from './users/users.service';
+import { UserDto } from './dto/user.dto';
+import { User } from '@prisma/client';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService,private readonly meetupService: MeetupService) {}
-
-  @UseGuards(AuthGuard('local'))
+  constructor(private readonly appService: AppService,private readonly meetupService: MeetupService,private authService:AuthService,private readonly userService:UsersService) {}
+  
+  @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login (@Request() req){
-    return req.user
+    return this.authService.login(req.user)
+  }
+
+  @Post('registerUser')
+  async registerUser(@Body() userDto:UserDto){
+    return this.userService.createUser(userDto)
   }
 
   @Get()
@@ -27,7 +37,7 @@ export class AppController {
 
   @UsePipes(new ValidationPipe())
   @Post('create')
-  createMeetup(@Body() dto: CreateUntransformedDto){ 
+  createMeetup(@Body() dto: CreateMeetupUntransformedDto){ 
     const data = { name:dto.name,
 
       description:dto.description,
@@ -39,7 +49,7 @@ export class AppController {
   }
 
   @Put('change/:id')
-  changeMeetupInfo(@Param('id',ParseIntPipe) id:number, @Body() dto: CreateUntransformedDto){
+  changeMeetupInfo(@Param('id',ParseIntPipe) id:number, @Body() dto: CreateMeetupUntransformedDto){
     const data = { name:dto.name,
 
       description:dto.description,
