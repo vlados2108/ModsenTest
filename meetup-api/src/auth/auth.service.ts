@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import { UserDto } from 'src/dto/user.dto';
+import { User } from '@prisma/client';
 const bcrypt = require('bcrypt');
-
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService) {}
+    constructor(
+      private usersService: UsersService,
+      private jwtService: JwtService
+      ) {}
 
     saltRounds = 10;
 
@@ -19,4 +24,13 @@ export class AuthService {
         }
         return null;
       }
+    
+    login = async (user:User): Promise<{access_token:string}> => {
+      console.log("ss")
+      const payload = {username: user.name,sub:user.id}
+  
+      return{
+        access_token: this.jwtService.sign(payload)
+      }
+    }
 }
