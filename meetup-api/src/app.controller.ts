@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,Request,SetMetadata  } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreateMeetupDto } from './dto/createMeetup.dto';
 import { MeetupService } from './meetup/meetup.service';
@@ -10,18 +10,19 @@ import { UsersService } from './users/users.service';
 import { UserDto } from './dto/user.dto';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-
+import { ConfigService } from '@nestjs/config';
+import { Public } from './decorators/public';
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService,private readonly meetupService: MeetupService,private authService:AuthService,private readonly userService:UsersService) {}
+  constructor(private readonly appService: AppService,private readonly meetupService: MeetupService,private authService:AuthService,private readonly userService:UsersService,private readonly configService:ConfigService) {}
   
   @UseGuards(LocalAuthGuard)
+  @Public()
   @Post('auth/login')
   async login (@Request() req){
     return this.authService.login(req.user)
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
