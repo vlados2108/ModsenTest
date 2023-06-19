@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserDto } from 'src/dto/user.dto';
@@ -26,7 +26,6 @@ export class AuthService {
       }
     
     login = async (user:User): Promise<{access_token:string}> => {
-      console.log("ss")
       const payload = {username: user.name,sub:user.id}
   
       return{
