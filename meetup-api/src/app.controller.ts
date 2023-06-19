@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,Request,SetMetadata  } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,SetMetadata, Res,Req  } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreateMeetupDto } from './dto/createMeetup.dto';
 import { MeetupService } from './meetup/meetup.service';
@@ -12,6 +12,7 @@ import { User } from '@prisma/client';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { Public } from './decorators/public';
+import { Request, Response } from 'express';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService,private readonly meetupService: MeetupService,private authService:AuthService,private readonly userService:UsersService,private readonly configService:ConfigService) {}
@@ -19,15 +20,22 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Public()
   @Post('auth/login')
-  async login (@Request() req){
-    return this.authService.login(req.user)
+  async login (@Req() req,@Res({passthrough:true}) res:Response){
+    const {access_token} = await this.authService.login(req.user)
+    res.cookie("access_token",access_token,{
+      httpOnly:true,
+      secure:false,
+      sameSite:"lax",
+      expires:new Date(Date.now() + 1*24*60*1000)
+    }).send({status:'ok'})
   }
 
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req) {
     return req.user;
   }
   
+  @Public()
   @Post('registerUser')
   async registerUser(@Body() userDto:UserDto){
     return this.userService.createUser(userDto)
