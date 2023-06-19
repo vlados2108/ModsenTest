@@ -26,6 +26,6 @@ export class UsersService {
         }catch(e){
             throw new HttpException(`can't create user}`,500)
         }
-
+ 
     }
 }
