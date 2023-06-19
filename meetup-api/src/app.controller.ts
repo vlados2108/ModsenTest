@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe,SetMetadata, Res,Req  } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateMeetupDto } from './dto/createMeetup.dto';
+import { CreateMeetupDto } from './meetup/dto/createMeetup.dto';
 import { MeetupService } from './meetup/meetup.service';
 import { CreateMeetupUntransformedDto } from './dto/createMeetupUntransformed.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { UsersService } from './users/users.service';
-import { UserDto } from './dto/user.dto';
+import { UserDto } from './users/dto/user.dto';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';

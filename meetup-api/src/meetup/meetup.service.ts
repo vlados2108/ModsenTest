@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Meetup } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateMeetupDto } from 'src/dto/createMeetup.dto';
+import { CreateMeetupDto } from 'src/meetup/dto/createMeetup.dto';
 
 @Injectable()
 export class MeetupService {

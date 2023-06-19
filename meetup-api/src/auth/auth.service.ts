@@ -1,7 +1,7 @@
 import { Injectable, Res } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserDto } from 'src/dto/user.dto';
+import { UserDto } from 'src/users/dto/user.dto';
 import { User } from '@prisma/client';
 const bcrypt = require('bcrypt');
 
