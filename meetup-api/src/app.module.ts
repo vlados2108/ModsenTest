@@ -9,7 +9,7 @@ import { UsersService } from './users/users.service';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [DatabaseModule, AuthModule, UsersModule,ConfigModule.forRoot({
