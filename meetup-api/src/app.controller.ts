@@ -15,6 +15,7 @@ import {
   Req,
   UseFilters,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MeetupService } from './meetup/meetup.service';
@@ -94,8 +95,12 @@ export class AppController {
   }
 
   @Get()
-  getAllMeetups() {
-    return this.meetupService.getMeetups();
+  async getMeetups(@Query() filter) {
+    if (Object.keys(filter).length){
+      return this.meetupService.getMeetups(filter)
+    }else{
+      return this.meetupService.getAllMeetups()
+    }
   }
 
   @Get('get/:id')
