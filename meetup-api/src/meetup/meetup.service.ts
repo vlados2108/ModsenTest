@@ -21,7 +21,6 @@ export class MeetupService {
     const res = await this.databaseService.meetup.findUnique({
       where: { id: id },
     }); 
-    console.log(res)
     if (!res) {
       throw new NotFoundException(`Meetup with ID ${id} not found`);
     }
