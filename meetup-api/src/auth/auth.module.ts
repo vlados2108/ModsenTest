@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -19,11 +20,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       inject:[ConfigService],
       useFactory: async (configService:ConfigService) => ({
         secret:configService.get<string>('secretKey'),
-        signOptions:{expiresIn:'1d'}
+        signOptions:{expiresIn:configService.get<string>('accessExpiresIn')}
       })
     })
   ],
-  providers: [AuthService,LocalStrategy,JwtStrategy],
+  providers: [AuthService,LocalStrategy,JwtStrategy,RefreshTokenStrategy],
   exports:[AuthService]
 })
 export class AuthModule {}
