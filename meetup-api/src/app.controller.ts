@@ -14,6 +14,7 @@ import {
   Res,
   Req,
   UseFilters,
+  HttpCode,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MeetupService } from './meetup/meetup.service';
@@ -31,6 +32,7 @@ import { Request, Response } from 'express';
 import { AuthFilter } from './exceptionFilters/auth.filter';
 import { NotFoundExceptionFilter } from './exceptionFilters/notFound.filter';
 import { ConflictExceptionFilter } from './exceptionFilters/conflict.filter';
+import JwtRefreshGuard from './auth/guards/jwt-refresh.guard';
 
 @Controller()
 @UseFilters(
@@ -43,25 +45,42 @@ export class AppController {
     private readonly appService: AppService,
     private readonly meetupService: MeetupService,
     private authService: AuthService,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
     private readonly configService: ConfigService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
   @Public()
-  @Post('auth/login')
+  @Post('auth/login') 
   async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const { access_token } = await this.authService.login(req.user);
-    res
-      .cookie('access_token', access_token, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-      })
-      .send({ status: 'ok' });
+    const user = req.user
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user.id);
+    const refreshTokenCookie = this.authService.getCookieWithJwtRefreshToken(user.id);
+
+    await this.usersService.setCurrentRefreshToken(refreshTokenCookie.token,user.id)
+
+    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie.cookie])
+    return user
   }
 
+  @Public()
+  @UseGuards(JwtRefreshGuard)
+  @Get('refresh')
+  refresh(@Req() request) {    
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id);
+ 
+    request.res.setHeader('Set-Cookie', accessTokenCookie);
+    return request.user;
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Post('log-out')
+  @HttpCode(200)
+  async logOut(@Req() request) {
+    await this.usersService.removeRefreshToken(request.user.id);
+    request.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+  }
+  
   @Get('profile')
   getProfile(@Req() req) {
     return req.user;
@@ -70,7 +89,7 @@ export class AppController {
   @Public()
   @Post('registerUser')
   async registerUser(@Body() userDto: UserDto) {
-    return this.userService.createUser(userDto);
+    return this.usersService.createUser(userDto);
   }
 
   @Get()
