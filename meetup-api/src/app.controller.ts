@@ -33,6 +33,7 @@ import { AuthFilter } from './exceptionFilters/auth.filter';
 import { NotFoundExceptionFilter } from './exceptionFilters/notFound.filter';
 import { ConflictExceptionFilter } from './exceptionFilters/conflict.filter';
 import JwtRefreshGuard from './auth/guards/jwt-refresh.guard';
+import { CreateUserDto } from './users/dto/createUser.dto';
 
 @Controller()
 @UseFilters(
@@ -88,7 +89,7 @@ export class AppController {
 
   @Public()
   @Post('registerUser')
-  async registerUser(@Body() userDto: UserDto) {
+  async registerUser(@Body() userDto: CreateUserDto) {
     return this.usersService.createUser(userDto);
   }
 
