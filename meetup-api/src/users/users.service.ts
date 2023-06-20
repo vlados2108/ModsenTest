@@ -2,6 +2,7 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { UserDto } from 'src/users/dto/user.dto';
+import { CreateUserDto } from './dto/createUser.dto';
 const bcrypt = require('bcrypt');
 
 @Injectable()
@@ -34,7 +35,7 @@ export class UsersService {
     })
   }
 
-  createUser = async (data: UserDto): Promise<User> => {
+  createUser = async (data: CreateUserDto): Promise<User> => {
     const hash = bcrypt.hashSync(data.password, 10);
     data.password = hash;
     const res = await this.databaseService.user.create({ data: data });
