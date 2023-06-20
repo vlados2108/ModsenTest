@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable, Res } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserDto } from 'src/users/dto/user.dto';
 import { User } from '@prisma/client';
-import { CreateUserDto } from 'src/users/dto/createUser.dto';
+
 import { ConfigService } from '@nestjs/config';
 const bcrypt = require('bcrypt');
 
