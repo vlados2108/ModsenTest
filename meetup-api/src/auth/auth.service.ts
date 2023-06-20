@@ -5,7 +5,6 @@ import { UserDto } from 'src/users/dto/user.dto';
 import { User } from '@prisma/client';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
 import { ConfigService } from '@nestjs/config';
-import { PayloadForJwtDto } from './dto/payloadForJwt.dto';
 const bcrypt = require('bcrypt');
 
 @Injectable()
