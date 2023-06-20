@@ -1,15 +1,19 @@
-import { Injectable, Res } from '@nestjs/common';
+import { BadRequestException, Injectable, Res } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserDto } from 'src/users/dto/user.dto';
 import { User } from '@prisma/client';
+import { CreateUserDto } from 'src/users/dto/createUser.dto';
+import { ConfigService } from '@nestjs/config';
+import { PayloadForJwtDto } from './dto/payloadForJwt.dto';
 const bcrypt = require('bcrypt');
 
 @Injectable()
 export class AuthService {
     constructor(
       private usersService: UsersService,
-      private jwtService: JwtService
+      private jwtService: JwtService,
+      private configService: ConfigService
       ) {}
 
     saltRounds = 10;
@@ -25,6 +29,36 @@ export class AuthService {
         return null;
       }
     
+    public getCookieWithJwtAccessToken(id: number) {
+      const payload = {id}
+      const token = this.jwtService.sign(payload, {
+        secret: this.configService.get('secretKey'),
+        expiresIn: `${this.configService.get('accessExpiresIn')}s`
+      });
+      return `access_token=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('accessExpiresIn')}`;
+    }
+   
+    public getCookieWithJwtRefreshToken(id: number) {
+      const payload = {id}
+      const token = this.jwtService.sign(payload, {
+        secret: this.configService.get('refreshSecret'),
+        expiresIn: `${this.configService.get('refreshExpiresIn')}s`
+      });
+      const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('refreshExpiresIn')}`;
+      return {
+        cookie,
+        token
+      }
+    }
+
+
+    public getCookiesForLogOut() {
+      return [
+        'Authentication=; HttpOnly; Path=/; Max-Age=0',
+        'Refresh=; HttpOnly; Path=/; Max-Age=0'
+      ];
+    }
+
     login = async (user:User): Promise<{access_token:string}> => {
       const payload = {username: user.name,sub:user.id}
   
