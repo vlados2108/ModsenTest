@@ -17,7 +17,8 @@ model Meetup {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String @default("")
-  password String @default("")
+  id                 Int     @id @default(autoincrement())
+  name               String  @default("")
+  password           String  @default("")
+  hashedRefreshToken String?
 }
