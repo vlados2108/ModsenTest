@@ -90,7 +90,7 @@ export class AppController {
 
   @Public()
   @Post('registerUser')
-  async registerUser(@Body() userDto: CreateUserDto) {
+  async registerUser(@Body() userDto: UserDto) {
     return this.usersService.createUser(userDto);
   }
 
