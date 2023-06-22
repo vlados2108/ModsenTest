@@ -4,21 +4,21 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model Meetup {
-  id          Int      @id @default(autoincrement())
-  name        String   @default("")
-  description String   @default("")
-  tegs        String   @default("")
-  time        DateTime @default(now()) @db.Timestamp(6)
-  place       String   @default("")
+  url      = env("CONNECTION_STRING")
 }
 
 model User {
   id                 Int     @id @default(autoincrement())
-  name               String  @default("")
-  password           String  @default("")
+  name               String?
+  password           String?
   hashedRefreshToken String?
+}
+
+model Meetup {
+  id          Int       @id(map: "meetup_pkey") @default(autoincrement())
+  name        String?
+  description String?
+  tegs        String?
+  time        DateTime? @db.Timestamp(6)
+  place       String?
 }
