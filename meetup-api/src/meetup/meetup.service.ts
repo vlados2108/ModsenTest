@@ -21,12 +21,13 @@ export class MeetupService {
           meetup.tegs.includes(search) ||
           meetup.time.toString().includes(search),
       );
+        
 
     if (filterLow)
-      res = res.filter((meetup) => meetup.time > new Date(filterLow));
+      res = res.filter((meetup) => meetup.time >= new Date(filterLow));
 
     if (filterHigh)
-      res = res.filter((meetup) => meetup.time < new Date(filterHigh));
+      res = res.filter((meetup) => meetup.time <= new Date(filterHigh));
 
     if (sort)
       if (sort == 'asc')
