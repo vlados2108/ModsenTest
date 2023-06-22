@@ -35,10 +35,11 @@ export class UsersService {
     })
   }
 
-  createUser = async (data: CreateUserDto): Promise<User> => {
+  createUser = async (data: UserDto): Promise<User> => {
     const hash = bcrypt.hashSync(data.password, 10);
+    const user = {name:data.name,password:hash,hashedRefreshToken:null}
     data.password = hash;
-    const res = await this.databaseService.user.create({ data: data });
+    const res = await this.databaseService.user.create({ data: user });
     if (!res) throw new HttpException(`can't create user}`, 409);
     return res;
   };
