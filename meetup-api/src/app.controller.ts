@@ -35,6 +35,8 @@ import { NotFoundExceptionFilter } from './exceptionFilters/notFound.filter';
 import { ConflictExceptionFilter } from './exceptionFilters/conflict.filter';
 import JwtRefreshGuard from './auth/guards/jwt-refresh.guard';
 import { CreateUserDto } from './users/dto/createUser.dto';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
 
 @Controller()
 @UseFilters(
@@ -42,6 +44,7 @@ import { CreateUserDto } from './users/dto/createUser.dto';
   new ConflictExceptionFilter(),
   new NotFoundExceptionFilter(),
 )
+@UseGuards(RolesGuard)
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -110,6 +113,7 @@ export class AppController {
 
   @UsePipes(new ValidationPipe())
   @Post('create')
+  @Roles('admin')
   createMeetup(@Body() dto: CreateMeetupUntransformedDto) {
     const data = {
       name: dto.name,
@@ -124,6 +128,7 @@ export class AppController {
   }
 
   @Put('change/:id')
+  @Roles('admin')
   changeMeetupInfo(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateMeetupUntransformedDto,
@@ -141,6 +146,7 @@ export class AppController {
   }
 
   @Delete('delete/:id')
+  @Roles('admin')
   deleteMeetup(@Param('id', ParseIntPipe) id: number) {
     return this.meetupService.deleteMeetup(id);
   }
