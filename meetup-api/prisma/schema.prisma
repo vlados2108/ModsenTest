@@ -8,17 +8,28 @@ datasource db {
 }
 
 model User {
-  id                 Int     @id @default(autoincrement())
+  id                 Int             @id @default(autoincrement())
   name               String?
   password           String?
   hashedRefreshToken String?
+  role               String?         @default("guest")
+  meetups_users      meetups_users[]
 }
 
 model Meetup {
-  id          Int       @id(map: "meetup_pkey") @default(autoincrement())
-  name        String?
-  description String?
-  tegs        String?
-  time        DateTime? @db.Timestamp(6)
-  place       String?
+  id            Int             @id(map: "meetup_pkey") @default(autoincrement())
+  name          String?
+  description   String?
+  tegs          String?
+  time          DateTime?       @db.Timestamp(6)
+  place         String?
+  meetups_users meetups_users[]
+}
+
+model meetups_users {
+  id        Int    @id @default(autoincrement())
+  meetup_id Int
+  user_id   Int
+  Meetup    Meetup @relation(fields: [meetup_id], references: [id])
+  User      User   @relation(fields: [user_id], references: [id])
 }
