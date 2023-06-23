@@ -1,13 +1,15 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { Meetup } from '@prisma/client';
+import { Meetup, meetups_users } from '@prisma/client';
 import { empty } from '@prisma/client/runtime';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateMeetupDto } from 'src/meetup/dto/createMeetup.dto';
 import { FilterDto } from './dto/filter.dto';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class MeetupService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService,private jwtService:JwtService,private usersService:UsersService) {}
 
   getMeetups = async (options: FilterDto): Promise<Meetup[]> => {
     const { search, filterLow, filterHigh, sort, page ,perPage } = options;
@@ -102,4 +104,16 @@ export class MeetupService {
 
     return res;
   };
+
+  signUpForMeetup = async (meetupId:number,token:string):Promise<meetups_users> =>{
+    const decoded = this.jwtService.decode(token);
+    let id = 0;
+    if (typeof decoded == 'object') id = decoded.id;
+    let user = await this.usersService.getUserById(id);
+    const res = await this.databaseService.meetups_users.create({
+      data:{meetup_id:meetupId,user_id:user.id}
+    })
+    if (!res) throw new HttpException("can't create meetups_users entity", 409);
+    return res
+  }
 }
