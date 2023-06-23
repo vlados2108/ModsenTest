@@ -37,6 +37,8 @@ import JwtRefreshGuard from './auth/guards/jwt-refresh.guard';
 import { CreateUserDto } from './users/dto/createUser.dto';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { LoginUserDto } from './users/dto/loginUser.dto';
 
 @Controller()
 @UseFilters(
@@ -55,6 +57,13 @@ export class AppController {
   ) {}
 
   @UseGuards(LocalAuthGuard)
+  @ApiOperation({
+    summary:"Log in as user",
+    description:"If you want to login,use this route"
+  })
+  @ApiBody({
+    type:LoginUserDto
+  })
   @Public()
   @Post('auth/login')
   async login(@Req() req, @Res({ passthrough: true }) res: Response) {
@@ -78,6 +87,10 @@ export class AppController {
     return user;
   }
 
+  @ApiOperation({
+    summary:"Refresh Access token",
+    description:"Use this when your access token has expired to create a new one"
+  })
   @Public()
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
@@ -90,25 +103,34 @@ export class AppController {
     return request.user;
   }
 
+  @ApiOperation({
+    summary:"Log out",
+    description:"Use this method for loging out"
+  })
   @UseGuards(JwtAuthGuard)
   @Post('log-out')
   @HttpCode(200)
   async logOut(@Req() request) {
-    await this.usersService.removeRefreshToken(request.user.id);
+    await this.usersService.removeRefreshToken(request.cookies.access_token);
     request.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
+    return "u have succesfuly logged out"
   }
 
-  @Get('profile')
-  getProfile(@Req() req) {
-    return req.user;
-  }
-
+  
+  @ApiOperation({
+    summary:"Creates new user",
+    description:"Use this method to create a new User"
+  })
   @Public()
   @Post('registerUser')
   async registerUser(@Body() userDto: UserDto) {
     return this.usersService.createUser(userDto);
   }
 
+  @ApiOperation({
+    summary:"Returns all meetups",
+    description:"Use this method to return all meetups"
+  })
   @Get()
   async getMeetups(@Query() filter) {
     if (Object.keys(filter).length) {
@@ -118,11 +140,19 @@ export class AppController {
     }
   }
 
+  @ApiOperation({
+    summary:"Returns meetup with a given id",
+    description:"Use this method to return a meetup with a speacific id"
+  })
   @Get('get/:id')
   getMeetupById(@Param('id', ParseIntPipe) id: number) {
     return this.meetupService.getMeetupById(id);
   }
 
+  @ApiOperation({
+    summary:"Created new meetup",
+    description:"Use this method to create new meetup"
+  })
   @UsePipes(new ValidationPipe())
   @Post('create')
   @Roles('admin')
@@ -139,6 +169,10 @@ export class AppController {
     return this.meetupService.createMeetup(data);
   }
 
+  @ApiOperation({
+    summary:"Updates meetup",
+    description:"Use this method to update a meetup"
+  })
   @Put('change/:id')
   @Roles('admin')
   changeMeetupInfo(
@@ -157,12 +191,20 @@ export class AppController {
     return this.meetupService.updateMeetup({ id, data: data });
   }
 
+  @ApiOperation({
+    summary:"Deletes a meetup",
+    description:"Use this method to delete all meetups"
+  })
   @Delete('delete/:id')
   @Roles('admin')
   deleteMeetup(@Param('id', ParseIntPipe) id: number) {
     return this.meetupService.deleteMeetup(id);
   }
 
+  @ApiOperation({
+    summary:"Sign's user for a meetup",
+    description:"Use this method to sign for meetup"
+  })
   @Post('signup/:meetupId')
   signUpForMeetUp(@Req() req, @Param('meetupId', ParseIntPipe) id: number) {
     return this.meetupService.signUpForMeetup(id, req.cookies.access_token);
