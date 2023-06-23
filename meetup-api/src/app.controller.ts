@@ -150,4 +150,9 @@ export class AppController {
   deleteMeetup(@Param('id', ParseIntPipe) id: number) {
     return this.meetupService.deleteMeetup(id);
   }
+
+  @Post('signup/:meetupId')
+  signUpForMeetUp(@Req() req, @Param('meetupId', ParseIntPipe) id: number){
+    return this.meetupService.signUpForMeetup(id,req.cookies.access_token)
+  }
 }
