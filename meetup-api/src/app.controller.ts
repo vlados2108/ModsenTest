@@ -56,28 +56,40 @@ export class AppController {
 
   @UseGuards(LocalAuthGuard)
   @Public()
-  @Post('auth/login') 
+  @Post('auth/login')
   async login(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const user = req.user
-    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(user.id);
-    const refreshTokenCookie = this.authService.getCookieWithJwtRefreshToken(user.id);
+    const user = req.user;
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
+      user.id,
+    );
+    const refreshTokenCookie = this.authService.getCookieWithJwtRefreshToken(
+      user.id,
+    );
 
-    await this.usersService.setCurrentRefreshToken(refreshTokenCookie.token,user.id)
+    await this.usersService.setCurrentRefreshToken(
+      refreshTokenCookie.token,
+      user.id,
+    );
 
-    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie.cookie])
-    return user
+    req.res.setHeader('Set-Cookie', [
+      accessTokenCookie,
+      refreshTokenCookie.cookie,
+    ]);
+    return user;
   }
 
   @Public()
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
-  refresh(@Req() request) {    
-    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(request.user.id);
- 
+  refresh(@Req() request) {
+    const accessTokenCookie = this.authService.getCookieWithJwtAccessToken(
+      request.user.id,
+    );
+
     request.res.setHeader('Set-Cookie', accessTokenCookie);
     return request.user;
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Post('log-out')
   @HttpCode(200)
@@ -85,7 +97,7 @@ export class AppController {
     await this.usersService.removeRefreshToken(request.user.id);
     request.res.setHeader('Set-Cookie', this.authService.getCookiesForLogOut());
   }
-  
+
   @Get('profile')
   getProfile(@Req() req) {
     return req.user;
@@ -99,10 +111,10 @@ export class AppController {
 
   @Get()
   async getMeetups(@Query() filter) {
-    if (Object.keys(filter).length){
-      return this.meetupService.getMeetups(filter)
-    }else{
-      return this.meetupService.getAllMeetups()
+    if (Object.keys(filter).length) {
+      return this.meetupService.getMeetups(filter);
+    } else {
+      return this.meetupService.getAllMeetups();
     }
   }
 
@@ -152,7 +164,7 @@ export class AppController {
   }
 
   @Post('signup/:meetupId')
-  signUpForMeetUp(@Req() req, @Param('meetupId', ParseIntPipe) id: number){
-    return this.meetupService.signUpForMeetup(id,req.cookies.access_token)
+  signUpForMeetUp(@Req() req, @Param('meetupId', ParseIntPipe) id: number) {
+    return this.meetupService.signUpForMeetup(id, req.cookies.access_token);
   }
 }

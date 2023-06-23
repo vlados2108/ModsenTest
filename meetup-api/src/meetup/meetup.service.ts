@@ -9,10 +9,14 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class MeetupService {
-  constructor(private readonly databaseService: DatabaseService,private jwtService:JwtService,private usersService:UsersService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private jwtService: JwtService,
+    private usersService: UsersService,
+  ) {}
 
   getMeetups = async (options: FilterDto): Promise<Meetup[]> => {
-    const { search, filterLow, filterHigh, sort, page ,perPage } = options;
+    const { search, filterLow, filterHigh, sort, page, perPage } = options;
     let res = await this.databaseService.meetup.findMany({});
     if (search)
       res = res.filter(
@@ -23,7 +27,6 @@ export class MeetupService {
           meetup.tegs.includes(search) ||
           meetup.time.toString().includes(search),
       );
-        
 
     if (filterLow)
       res = res.filter((meetup) => meetup.time >= new Date(filterLow));
@@ -39,17 +42,17 @@ export class MeetupService {
           return 0;
         });
       else if (sort == 'desc')
-      res.sort((a, b) => {
-        if (a.time < b.time) return 1;
-        if (a.time > b.time) return -1;
-        return 0;
-      });
+        res.sort((a, b) => {
+          if (a.time < b.time) return 1;
+          if (a.time > b.time) return -1;
+          return 0;
+        });
 
-    if (page && perPage){
-      const startIndex = (page-1)*perPage
-      const endindex = startIndex + perPage
+    if (page && perPage) {
+      const startIndex = (page - 1) * perPage;
+      const endindex = startIndex + perPage;
 
-      res = res.slice(startIndex,endindex)
+      res = res.slice(startIndex, endindex);
     }
 
     if (!res) {
@@ -105,15 +108,18 @@ export class MeetupService {
     return res;
   };
 
-  signUpForMeetup = async (meetupId:number,token:string):Promise<meetups_users> =>{
+  signUpForMeetup = async (
+    meetupId: number,
+    token: string,
+  ): Promise<meetups_users> => {
     const decoded = this.jwtService.decode(token);
     let id = 0;
     if (typeof decoded == 'object') id = decoded.id;
     let user = await this.usersService.getUserById(id);
     const res = await this.databaseService.meetups_users.create({
-      data:{meetup_id:meetupId,user_id:user.id}
-    })
+      data: { meetup_id: meetupId, user_id: user.id },
+    });
     if (!res) throw new HttpException("can't create meetups_users entity", 409);
-    return res
-  }
+    return res;
+  };
 }
