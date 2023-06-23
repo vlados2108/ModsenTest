@@ -3,11 +3,12 @@ import { User } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { UserDto } from 'src/users/dto/user.dto';
 import { CreateUserDto } from './dto/createUser.dto';
+import { JwtService } from '@nestjs/jwt';
 const bcrypt = require('bcrypt');
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService,private jwtService:JwtService) {}
 
   getUser = async (username: string): Promise<User> => {
     const user = await this.databaseService.user.findFirst({
@@ -57,9 +58,13 @@ export class UsersService {
     }
   }
 
-  async removeRefreshToken(userId: number) {
+  async removeRefreshToken(token: string) {
+    const decoded = this.jwtService.decode(token);
+    let id = 0;
+    if (typeof decoded == 'object') id = decoded.id;
+    let user = await this.getUserById(id);
     return this.databaseService.user.update({
-      where:{id:userId},
+      where:{id:user.id},
       data:{hashedRefreshToken:null}
     });
   }
